@@ -18,7 +18,7 @@ obj/
 
 # 敏感文件 - 不要提交到 GitHub
 # 如果 zh.txt 包含真实账号信息，请不要提交
-# zh.txt  # 取消注释以忽略账号文件
+# zh.txt  # 已注释，zh.txt 会被提交到 GitHub 用于在线验证
 
 # 签名密钥
 *.pfx

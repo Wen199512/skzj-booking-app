@@ -7,13 +7,14 @@ namespace skzj;
 
 public partial class LoginPage : ContentPage
 {
-    private readonly BookingService _bookingService;
+    private readonly OnlineAccountService _onlineAccountService;
     private List<Account> _accounts = new();
+    private bool _fromGitHub = false;
 
     public LoginPage()
     {
         InitializeComponent();
-        _bookingService = new BookingService();
+        _onlineAccountService = new OnlineAccountService();
         _ = LoadAccountsAsync();
     }
 
@@ -21,22 +22,33 @@ public partial class LoginPage : ContentPage
     {
         try
         {
-            // 从嵌入式资源提取 zh.txt 到应用数据目录
-            var filePath = await EmbeddedResourceHelper.ExtractEmbeddedResourceAsync("zh.txt");
-            
-            // 加载账号
-            _accounts = await _bookingService.LoadAccountsFromFileAsync(filePath);
+            lblAccountStatus.Text = "正在连接服务器...";
+            lblAccountStatus.TextColor = Colors.Orange;
+            lblAccountStatus.IsVisible = true;
+
+            // 从 GitHub 或本地加载账号
+            var result = await _onlineAccountService.LoadAccountsAsync();
+            _accounts = result.Accounts;
+            _fromGitHub = result.FromGitHub;
             
             if (_accounts.Count > 0)
             {
-                lblAccountStatus.Text = $"已连接";
-                lblAccountStatus.TextColor = Colors.Green;
+                if (_fromGitHub)
+                {
+                    lblAccountStatus.Text = $"已连接 (在线 {_accounts.Count} 个账号)";
+                    lblAccountStatus.TextColor = Colors.Green;
+                }
+                else
+                {
+                    lblAccountStatus.Text = $"已连接 (离线 {_accounts.Count} 个账号)";
+                    lblAccountStatus.TextColor = Colors.Orange;
+                }
                 lblAccountStatus.IsVisible = true;
             }
             else
             {
                 lblAccountStatus.Text = "连接失败";
-                lblAccountStatus.TextColor = Colors.Orange;
+                lblAccountStatus.TextColor = Colors.Red;
                 lblAccountStatus.IsVisible = true;
             }
         }
