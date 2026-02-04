@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="skzj.LoginPage"
+             Title="Login"
+             BackgroundColor="#F5F5F5">
+
+    <Grid VerticalOptions="Center" Padding="30">
+        <VerticalStackLayout Spacing="25" VerticalOptions="Center">
+            
+            <Frame BackgroundColor="White" Padding="20" HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="首矿之家" 
+                           FontSize="32" 
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           TextColor="#2196F3" />
+                    <Label Text="活动预约系统" 
+                           FontSize="18" 
+                           HorizontalTextAlignment="Center"
+                           TextColor="#666666" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="White" Padding="25" HasShadow="True">
+                <VerticalStackLayout Spacing="20">
+                    
+                    <Label Text="请输入您的姓名" 
+                           FontSize="16" 
+                           FontAttributes="Bold"
+                           TextColor="#333333" />
+                    
+                    <Frame BorderColor="#E0E0E0" Padding="0" CornerRadius="8" HasShadow="False">
+                        <Entry x:Name="txtName" 
+                               Placeholder="姓名"
+                               FontSize="16"
+                               TextColor="#333333"
+                               PlaceholderColor="#999999" />
+                    </Frame>
+
+                    <Label Text="请输入验证码" 
+                           FontSize="16" 
+                           FontAttributes="Bold"
+                           TextColor="#333333"
+                           Margin="0,10,0,0" />
+                    
+                    <Frame BorderColor="#E0E0E0" Padding="0" CornerRadius="8" HasShadow="False">
+                        <Entry x:Name="txtCode" 
+                               Placeholder="账号后四位数字"
+                               FontSize="16"
+                               Keyboard="Numeric"
+                               MaxLength="4"
+                               Completed="OnLoginClicked"
+                               TextColor="#333333"
+                               PlaceholderColor="#999999" />
+                    </Frame>
+
+                    <Label x:Name="lblError" 
+                           Text=""
+                           FontSize="14"
+                           TextColor="Red"
+                           IsVisible="False"
+                           HorizontalTextAlignment="Center" />
+
+                    <Button x:Name="btnLogin" 
+                            Text="登录" 
+                            Clicked="OnLoginClicked"
+                            BackgroundColor="#2196F3"
+                            TextColor="White"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="8"
+                            Margin="0,10,0,0" />
+
+                    <ActivityIndicator x:Name="loadingIndicator"
+                                       IsRunning="False"
+                                       IsVisible="False"
+                                       Color="#2196F3"
+                                       HeightRequest="30" />
+                    
+                    <!-- 连接状态提示 -->
+                    <Label x:Name="lblAccountStatus" 
+                           Text=""
+                           FontSize="12"
+                           TextColor="#666666"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="False" />
+
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

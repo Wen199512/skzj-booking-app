@@ -1,0 +1,94 @@
+name: Build and Release Android APK
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # 当推送版本标签时触发，如 v1.0.0
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Install .NET MAUI workload
+      run: dotnet workload install maui
+    
+    - name: Restore dependencies
+      run: dotnet restore skzj/skzj.csproj
+    
+    - name: Build Android APK
+      run: |
+        cd skzj
+        dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormat=apk -p:RuntimeIdentifier=android-arm64
+    
+    - name: Find APK file
+      id: find-apk
+      shell: pwsh
+      run: |
+        $apk = Get-ChildItem -Path "skzj/bin/Release/net9.0-android/android-arm64/publish/*.apk" -Recurse | Select-Object -First 1
+        if ($apk) {
+          echo "APK_PATH=$($apk.FullName)" >> $env:GITHUB_OUTPUT
+          echo "APK_NAME=$($apk.Name)" >> $env:GITHUB_OUTPUT
+          echo "Found APK: $($apk.Name)"
+        } else {
+          echo "No APK found!"
+          exit 1
+        }
+    
+    - name: Get version from tag
+      id: version
+      shell: pwsh
+      run: |
+        $tag = "${{ github.ref_name }}"
+        $version = $tag -replace '^v', ''
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ steps.find-apk.outputs.APK_PATH }}
+        name: 首矿之家活动预约系统 ${{ github.ref_name }}
+        body: |
+          ## 首矿之家活动预约系统 ${{ steps.version.outputs.VERSION }}
+          
+          ### ? 更新内容
+          - 请在发布时填写具体更新内容
+          
+          ### ?? 下载
+          - **APK 文件**: `${{ steps.find-apk.outputs.APK_NAME }}`
+          - **文件大小**: 约 10-15 MB
+          
+          ### ?? 系统要求
+          - Android 5.0 (API 21) 或更高版本
+          - ARM64 架构
+          
+          ### ?? 安装说明
+          1. 下载 APK 文件到您的 Android 设备
+          2. 打开文件管理器，找到下载的 APK
+          3. 点击安装（如果提示"未知来源"，请在设置中允许）
+          4. 安装完成后即可使用
+          
+          ### ?? 登录说明
+          - 使用您的姓名和验证码登录
+          - 验证码为您账号的后4位数字
+          
+          ### ?? 技术支持
+          如有问题，请联系管理员
+          
+          ---
+          
+          **发布时间**: ${{ github.event.created_at }}
+          **构建版本**: ${{ github.sha }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

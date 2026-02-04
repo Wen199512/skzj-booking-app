@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="skzj.MainPage"
+             Title="Activity Booking">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            
+            <!-- 当前用户信息 -->
+            <Frame BackgroundColor="#E3F2FD" Padding="15" HasShadow="True">
+                <Label x:Name="lblCurrentUser" 
+                       FontSize="14" 
+                       FontAttributes="Bold"
+                       TextColor="#1976D2" />
+            </Frame>
+
+            <!-- 活动查询 -->
+            <Label Text="活动查询" FontSize="16" FontAttributes="Bold" Margin="0,10,0,0" />
+            <Button x:Name="btnQueryActivities" 
+                    Text="查询活动列表" 
+                    Clicked="OnQueryActivitiesClicked"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White" />
+
+            <!-- 常规活动列表 -->
+            <Label Text="常规活动（点击选择）" FontSize="14" FontAttributes="Bold" />
+            <CollectionView x:Name="lstActivities" 
+                            SelectionMode="None"
+                            HeightRequest="150">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" Margin="0,5" BackgroundColor="#F5F5F5" HasShadow="False">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnActivityTapped" />
+                            </Frame.GestureRecognizers>
+                            <Label Text="{Binding DisplayText}" FontSize="12" />
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- 热门福利活动列表 -->
+            <Label Text="热门福利活动（点击选择）" FontSize="14" FontAttributes="Bold" />
+            <CollectionView x:Name="lstActivities2" 
+                            SelectionMode="None"
+                            HeightRequest="150">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" Margin="0,5" BackgroundColor="#FFF3E0" HasShadow="False">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnActivityTapped" />
+                            </Frame.GestureRecognizers>
+                            <Label Text="{Binding DisplayText}" FontSize="12" />
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- 已选择的活动 -->
+            <Label Text="已选择的活动（最多3项）" FontSize="14" FontAttributes="Bold" Margin="0,10,0,0" />
+            <Frame BorderColor="LightGray" Padding="10" MinimumHeightRequest="80">
+                <VerticalStackLayout x:Name="selectedActivitiesContainer" Spacing="5" />
+            </Frame>
+
+            <!-- 控制按钮 -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                <Button x:Name="btnStart" 
+                        Text="开始预约" 
+                        Clicked="OnStartClicked"
+                        BackgroundColor="#FF5722"
+                        TextColor="White"
+                        Grid.Column="0" />
+                <Button x:Name="btnStop" 
+                        Text="停止" 
+                        Clicked="OnStopClicked"
+                        BackgroundColor="#607D8B"
+                        TextColor="White"
+                        IsEnabled="False"
+                        Grid.Column="1" />
+            </Grid>
+
+            <!-- 日志区域 -->
+            <Label Text="运行日志" FontSize="16" FontAttributes="Bold" Margin="0,20,0,0" />
+            <Frame BorderColor="LightGray" Padding="10" HeightRequest="300">
+                <ScrollView x:Name="logScrollView">
+                    <Label x:Name="txtLog" 
+                           Text="等待操作..."
+                           FontSize="11"
+                           FontFamily="Courier"
+                           LineBreakMode="WordWrap" />
+                </ScrollView>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

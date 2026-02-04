@@ -1,0 +1,62 @@
+# .NET 构建输出
+bin/
+obj/
+*.apk
+*.aab
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 用户特定文件
+*.user
+*.suo
+.vs/
+
+# 敏感文件 - 不要提交到 GitHub
+# 如果 zh.txt 包含真实账号信息，请不要提交
+# zh.txt  # 取消注释以忽略账号文件
+
+# 签名密钥
+*.pfx
+*.keystore
+*.jks
+
+# 临时文件
+*.log
+*.tmp
+*.bak
+*~
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 发布文件夹
+Release/
+publish/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# Test results
+TestResults/
+*.trx
+
+# 日志
+*.log
+logs/
+
+# 缓存
+.cache/
+*.cache
