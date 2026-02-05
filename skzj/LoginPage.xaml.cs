@@ -240,44 +240,7 @@ public partial class LoginPage : ContentPage
 
                 if (result && !string.IsNullOrWhiteSpace(updateInfo.DownloadUrl))
                 {
-                    try
-                    {
-                        // 尝试打开蓝奏云下载链接
-                        var opened = await Launcher.TryOpenAsync(new Uri(updateInfo.DownloadUrl));
-                        
-                        if (!opened)
-                        {
-                            // 如果无法打开，显示下载地址让用户手动复制
-                            await DisplayAlert(
-                                "无法打开浏览器",
-                                $"请手动复制以下链接到浏览器下载：\n\n{updateInfo.DownloadUrl}\n\n" +
-                                "蓝奏云下载，国内高速访问",
-                                "确定");
-                        }
-                        else
-                        {
-                            // 成功打开，给用户提示
-                            await DisplayAlert(
-                                "下载提示",
-                                "已打开蓝奏云下载页面\n\n" +
-                                "1. 在页面中找到最新版本 APK\n" +
-                                "2. 点击下载按钮\n" +
-                                "3. 下载完成后点击安装\n" +
-                                "4. 选择\"覆盖安装\"保留数据",
-                                "知道了");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"打开链接失败: {ex.Message}");
-                        
-                        // 打开失败，显示链接让用户复制
-                        await DisplayAlert(
-                            "无法打开下载页面",
-                            $"请复制以下地址到浏览器下载：\n\n{updateInfo.DownloadUrl}\n\n" +
-                            "蓝奏云下载，国内高速访问",
-                            "确定");
-                    }
+                    await OpenDownloadUrlAsync(updateInfo.DownloadUrl);
                 }
             }
             else
@@ -304,6 +267,90 @@ public partial class LoginPage : ContentPage
             // 恢复按钮状态
             btnCheckUpdate.IsEnabled = true;
             btnCheckUpdate.Text = "检查更新";
+        }
+    }
+
+    /// <summary>
+    /// 打开下载链接（改进版，支持复制到剪贴板）
+    /// </summary>
+    private async Task OpenDownloadUrlAsync(string url)
+    {
+        try
+        {
+            // 方法1：使用 Browser.OpenAsync（更可靠）
+            await Browser.OpenAsync(url, BrowserLaunchMode.SystemPreferred);
+
+            // 成功打开，给用户提示
+            await DisplayAlert(
+                "下载提示",
+                "已打开蓝奏云下载页面\n\n" +
+                "1. 在页面中找到最新版本 APK\n" +
+                "2. 点击下载按钮\n" +
+                "3. 下载完成后点击安装\n" +
+                "4. 选择\"覆盖安装\"保留数据",
+                "知道了");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Browser.OpenAsync 失败: {ex.Message}");
+
+            // 如果 Browser.OpenAsync 失败，尝试 Launcher
+            try
+            {
+                var opened = await Launcher.TryOpenAsync(new Uri(url));
+                if (opened)
+                {
+                    await DisplayAlert(
+                        "下载提示",
+                        "已打开下载页面\n\n" +
+                        "请在页面中下载最新版本 APK",
+                        "知道了");
+                    return;
+                }
+            }
+            catch
+            {
+                // 忽略，继续到复制链接
+            }
+
+            // 所有方法都失败，提供复制链接选项
+            await ShowCopyLinkDialogAsync(url);
+        }
+    }
+
+    /// <summary>
+    /// 显示复制链接对话框
+    /// </summary>
+    private async Task ShowCopyLinkDialogAsync(string url)
+    {
+        var copyResult = await DisplayAlert(
+            "无法打开浏览器",
+            $"无法自动打开下载页面。\n\n" +
+            $"点击\"复制链接\"将下载地址复制到剪贴板，\n" +
+            $"然后手动粘贴到浏览器中打开。\n\n" +
+            $"下载地址：\n{url}",
+            "复制链接",
+            "取消");
+
+        if (copyResult)
+        {
+            try
+            {
+                await Clipboard.SetTextAsync(url);
+                await DisplayAlert(
+                    "复制成功",
+                    "下载链接已复制到剪贴板！\n\n" +
+                    "请打开浏览器，粘贴链接即可下载。",
+                    "知道了");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"复制到剪贴板失败: {ex.Message}");
+                await DisplayAlert(
+                    "复制失败",
+                    $"无法复制到剪贴板。\n\n请手动输入以下地址：\n{url}",
+                    "确定");
+            }
         }
     }
 
