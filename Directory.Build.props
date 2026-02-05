@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <AndroidSdkDirectory>C:\Program Files\dotnet\packs\Microsoft.Android.Sdk.Windows\36.1.2\tools</AndroidSdkDirectory>
+    <!-- Ignore invalid Java SDK from PATH -->
+    <JavaSdkDirectory></JavaSdkDirectory>
+  </PropertyGroup>
+</Project>

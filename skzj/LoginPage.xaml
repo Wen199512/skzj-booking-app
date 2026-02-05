@@ -86,11 +86,40 @@
                            TextColor="#666666"
                            HorizontalTextAlignment="Center"
                            IsVisible="False" />
+                    
+                    <!-- 检查更新按钮 -->
+                    <Button x:Name="btnCheckUpdate" 
+                            Text="检查更新" 
+                            Clicked="OnCheckUpdateClicked"
+                            BackgroundColor="Transparent"
+                            BorderColor="#2196F3"
+                            BorderWidth="1"
+                            TextColor="#2196F3"
+                            FontSize="14"
+                            HeightRequest="40"
+                            CornerRadius="8"
+                            Margin="0,5,0,0" />
+                    
+                    <!-- 版本信息 -->
+                    <Label x:Name="lblVersion" 
+                           Text=""
+                           FontSize="11"
+                           TextColor="#999999"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,5,0,0" />
 
                 </VerticalStackLayout>
             </Frame>
 
         </VerticalStackLayout>
+        
+        <!-- 右下角 By:W 标识 -->
+        <Label Text="By:W" 
+               FontSize="10"
+               TextColor="#BBBBBB"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               Margin="0,0,10,10" />
     </Grid>
 
 </ContentPage>

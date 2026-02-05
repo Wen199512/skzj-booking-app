@@ -218,38 +218,25 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            Log($"开始预约 {_selectedActivities.Count} 个活动...");
+            Log($"开始并行预约 {_selectedActivities.Count} 个活动...");
             Log($"预约人: {_currentAccount.Name}");
 
             var accounts = new List<Account> { _currentAccount };
-            var allResults = new List<string>();
 
-            // 依次预约每个活动
-            foreach (var activity in _selectedActivities)
+            // 并行预约所有选中的活动
+            var bookingTasks = _selectedActivities.Select(activity => 
+                BookActivityAsync(activity, accounts, cancellationToken)
+            ).ToList();
+
+            // 等待所有预约任务完成
+            var allResults = await Task.WhenAll(bookingTasks);
+
+            // 输出所有结果
+            foreach (var results in allResults)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
-                Log($"\n--- 预约活动: {activity.ActTitle} (ID: {activity.ActId}) ---");
-
-                var results = await _bookingService.RunBookingAsync(
-                    activity.ActId,
-                    accounts,
-                    cancellationToken,
-                    msg => Log(msg),
-                    () => Interlocked.Increment(ref _totalSubmits)
-                );
-
                 foreach (var result in results)
                 {
                     Log(result);
-                    allResults.Add($"[{activity.ActTitle}] {result}");
-                }
-
-                // 短暂延迟后预约下一个活动
-                if (_selectedActivities.IndexOf(activity) < _selectedActivities.Count - 1)
-                {
-                    await Task.Delay(1000, cancellationToken);
                 }
             }
 
@@ -278,6 +265,46 @@ public partial class MainPage : ContentPage
                 btnStart.IsEnabled = true;
                 btnStop.IsEnabled = false;
             });
+        }
+    }
+
+    /// <summary>
+    /// 预约单个活动
+    /// </summary>
+    private async Task<List<string>> BookActivityAsync(
+        ActivityInfo activity, 
+        List<Account> accounts, 
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            Log($"\n[{activity.ActTitle}] 开始预约 (ID: {activity.ActId})");
+
+            var results = await _bookingService.RunBookingAsync(
+                activity.ActId,
+                accounts,
+                cancellationToken,
+                msg => Log($"[{activity.ActTitle}] {msg}"),
+                () => Interlocked.Increment(ref _totalSubmits)
+            );
+
+            var formattedResults = results
+                .Select(r => $"[{activity.ActTitle}] {r}")
+                .ToList();
+
+            Log($"[{activity.ActTitle}] 预约完成");
+            
+            return formattedResults;
+        }
+        catch (OperationCanceledException)
+        {
+            Log($"[{activity.ActTitle}] 预约已取消");
+            return new List<string> { $"[{activity.ActTitle}] 预约已取消" };
+        }
+        catch (Exception ex)
+        {
+            Log($"[{activity.ActTitle}] 预约失败: {ex.Message}");
+            return new List<string> { $"[{activity.ActTitle}] 预约失败: {ex.Message}" };
         }
     }
 

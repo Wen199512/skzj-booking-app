@@ -8,8 +8,11 @@ namespace skzj.Services;
 /// </summary>
 public class UpdateService
 {
-    // GitHub API 地址（替换为您的仓库地址）
-    private const string GitHubApiUrl = "https://api.github.com/repos/YOUR_USERNAME/skzj-booking-app/releases/latest";
+    // GitHub API 地址（用于检查版本）
+    private const string GitHubApiUrl = "https://api.github.com/repos/Wen199512/skzj-booking-app/releases/latest";
+    
+    // 蓝奏云下载地址（实际下载地址）
+    private const string LanzouDownloadUrl = "https://wwbqz.lanzouu.com/b019vnsnuh";
     
     private readonly HttpClient _httpClient;
 
@@ -27,29 +30,44 @@ public class UpdateService
     {
         try
         {
+            System.Diagnostics.Debug.WriteLine($"开始检查更新，API: {GitHubApiUrl}");
+            
             var response = await _httpClient.GetFromJsonAsync<GitHubRelease>(GitHubApiUrl);
-            if (response == null) return null;
+            
+            if (response == null)
+            {
+                System.Diagnostics.Debug.WriteLine("API 返回为空");
+                return null;
+            }
 
             var latestVersion = response.TagName?.TrimStart('v');
             var currentVersion = AppInfo.Current.VersionString;
+            
+            System.Diagnostics.Debug.WriteLine($"当前版本: {currentVersion}");
+            System.Diagnostics.Debug.WriteLine($"最新版本: {latestVersion}");
 
             if (IsNewerVersion(latestVersion, currentVersion))
             {
+                System.Diagnostics.Debug.WriteLine("发现新版本！");
+                // 使用蓝奏云下载地址，而不是 GitHub 地址
                 return new UpdateInfo
                 {
                     LatestVersion = latestVersion,
                     CurrentVersion = currentVersion,
-                    DownloadUrl = response.Assets?.FirstOrDefault()?.BrowserDownloadUrl,
+                    DownloadUrl = LanzouDownloadUrl,  // 使用蓝奏云地址
                     ReleaseNotes = response.Body,
                     PublishedAt = response.PublishedAt
                 };
             }
 
+            System.Diagnostics.Debug.WriteLine("已是最新版本");
             return null;
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"检查更新失败: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"异常类型: {ex.GetType().Name}");
+            System.Diagnostics.Debug.WriteLine($"堆栈: {ex.StackTrace}");
             return null;
         }
     }

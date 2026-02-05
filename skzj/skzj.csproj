@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>skzj</RootNamespace>
@@ -18,14 +17,24 @@
 		<ApplicationId>com.skzj.booking</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
-
-		<WindowsPackageType>None</WindowsPackageType>
+		<ApplicationDisplayVersion>1.0.9</ApplicationDisplayVersion>
+		<ApplicationVersion>10</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+
+		<AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+
+		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+
+		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+
+		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+
+		<GenerateTestArtifacts>True</GenerateTestArtifacts>
+
+		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 	</PropertyGroup>
 
 	<!-- Release 配置优化 -->
@@ -33,24 +42,27 @@
 		<!-- 禁用调试符号以减小包体积 -->
 		<DebugType>none</DebugType>
 		<DebugSymbols>false</DebugSymbols>
+
+		<!-- 禁用 AOT 编译（避免构建错误） -->
+		<RunAOTCompilation>false</RunAOTCompilation>
+
+		<!-- 禁用 Trimming（保持兼容性） -->
+		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
 
 	<!-- Android 特定配置 -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
 		<!-- 默认生成 APK 格式 -->
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
-		
+
 		<!-- 启用链接以减小应用大小 -->
 		<AndroidLinkMode>SdkOnly</AndroidLinkMode>
-		
+
+		<!-- 使用 Visual Studio 的 Android SDK -->
+		<AndroidSdkDirectory>D:\Visual Studio\Shared\Android\android-sdk</AndroidSdkDirectory>
+
 		<!-- 支持的架构 -->
 		<RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
-	</PropertyGroup>
-
-	<!-- Windows 特定配置 -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows10.0.19041.0'">
-		<!-- 支持的架构 -->
-		<RuntimeIdentifiers>win10-x64;win10-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<ItemGroup>
